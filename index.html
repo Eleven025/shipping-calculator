@@ -1,142 +1,75 @@
+
 <!DOCTYPE html>
-<html lang="zh-Hant">
+<html lang="zh-TW">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>混合商品運費計算機</title>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>運費試算工具</title>
   <style>
-    body {
-      font-family: sans-serif;
-      padding: 1em;
-      background: #f9f9f9;
-    }
-    .container {
-      max-width: 500px;
-      margin: auto;
-      background: white;
-      padding: 1em;
-      border-radius: 10px;
-      box-shadow: 0 0 10px rgba(0,0,0,0.1);
-    }
-    input {
-      width: 100%;
-      padding: 0.5em;
-      margin-bottom: 1em;
-      border: 1px solid #ccc;
-      border-radius: 5px;
-    }
-    button {
-      width: 100%;
-      padding: 0.7em;
-      background-color: #4CAF50;
-      color: white;
-      border: none;
-      border-radius: 5px;
-      font-size: 1em;
-    }
-    .result {
-      margin-top: 1em;
-      padding: 1em;
-      background: #eef;
-      border-radius: 5px;
-    }
-    .note {
-      margin-top: 2em;
-      background: #fff8dc;
-      padding: 1em;
-      border-radius: 8px;
-      font-size: 0.95em;
-      color: #333;
-    }
-    img.inserted-image {
-      width: 100%;
-      max-height: 300px;
-      object-fit: contain;
-      margin-top: 1em;
-      border-radius: 10px;
-    }
+    body { font-family: sans-serif; padding: 2rem; max-width: 600px; margin: auto; }
+    label, input { display: block; margin-top: 1rem; width: 100%; }
+    button { margin-top: 1.5rem; padding: 0.5rem; font-size: 1rem; }
+    .note { font-size: 0.9rem; color: #555; margin-top: 2rem; }
+    .inserted-image { max-width: 100%; margin-top: 1rem; }
+    .alert { color: red; font-weight: bold; margin-top: 1rem; }
   </style>
 </head>
 <body>
-  <div class="container">
-    <h2>📦 混合商品運費試算器</h2>
-    <label>迷你霧面小盒（11.8×8.8×3.8cm）數量</label>
-    <input type="number" id="miniBox" min="0" step="1">
-
-    <label>亮面方形盒（14.9×16.1×3.8cm）數量</label>
-    <input type="number" id="squareBox" min="0" step="1">
-
-    <label>木頭杯墊（10×10×1.2cm）數量</label>
-    <input type="number" id="coaster" min="0" step="1">
-
-    <button onclick="calculateShipping()">試算運費</button>
-
-    <div class="result" id="result"></div>
-
-    <div class="note">
-      <strong>📌 給審稿小精靈們：</strong><br>
-      1. 本頁面僅提供初步估計，若實際上需要補運費，會在出貨時通知客人。<br>
-      2. 目前這個是 ChatGPT 寫的簡易使用網頁，可能會有尚未發現的 Bug，若有疑慮再請通知團主。<br>
-      3. 由於收納盒和木頭杯墊是體積較大、數量多時材積變大＋重量變重，超出超商店到店限制，這部分的運費計算時要再留意，或是參考下方附表。
-    </div>
-
-    <!-- ⬇️ 可自行嵌入圖片的位置（請將圖片網址替換 src） -->
-    <img src="YOUR_IMAGE_URL_HERE" alt="說明圖片" class="inserted-image">
-
+  <h1>混合商品運費試算器</h1>
+  <label>迷你霧面小盒（11.8x8.8x3.8cm）數量：<input type="number" id="miniBox" value="0" /></label>
+  <label>亮面方形盒（14.9x16.1x3.8cm）數量：<input type="number" id="glossyBox" value="0" /></label>
+  <label>方形木頭杯墊（10x10x1.2cm）數量：<input type="number" id="coaster" value="0" /></label>
+  <button onclick="calculate()">計算運費</button>
+  <h2 id="result"></h2>
+  <div id="warning" class="alert"></div>
+  <div class="note">
+    <p>給審稿小精靈們：</p>
+    <ol>
+      <li>本頁面僅提供初步估計，若實際上需要補運費，會在出貨時通知客人</li>
+      <li>目前這個是 ChatGPT 寫的簡易使用網頁，可能會有尚未發現的 Bug，若有疑慮再請通知團主</li>
+      <li>由於收納盒和木頭杯墊體積大、數量多時可能超過超商限制，請參考下方附表或切換為宅配</li>
+    </ol>
+    <img src="YOUR_IMAGE_URL_HERE" alt="說明圖片" class="inserted-image" />
   </div>
-
   <script>
-    function calculateShipping() {
-      const miniBoxVol = 11.8 * 8.8 * 3.8;
-      const squareBoxVol = 14.9 * 16.1 * 3.8;
-      const coasterVol = 10 * 10 * 1.2;
+    function calculate() {
+      const miniBox = parseInt(document.getElementById('miniBox').value) || 0;
+      const glossyBox = parseInt(document.getElementById('glossyBox').value) || 0;
+      const coaster = parseInt(document.getElementById('coaster').value) || 0;
 
-      const miniQty = parseInt(document.getElementById("miniBox").value) || 0;
-      const squareQty = parseInt(document.getElementById("squareBox").value) || 0;
-      const coasterQty = parseInt(document.getElementById("coaster").value) || 0;
+      const totalVolume = miniBox * 400 + glossyBox * 800 + coaster * 150;
+      let method = '';
+      let fee = 0;
+      let warning = '';
 
-      const totalVol = miniBoxVol * miniQty + squareBoxVol * squareQty + coasterVol * coasterQty;
-      const estimatedBoxVol = totalVol / 0.8;
-
-      const cubeRoot = Math.cbrt(estimatedBoxVol);
-      const width = cubeRoot;
-      const length = cubeRoot * 1.5;
-      const height = cubeRoot;
-      const volumeWeight = (length * width * height) / 6000;
-
-      let method = "";
-      let cost = 0;
-
-      const max711 = {
-        weight: 5,
-        size: 105,
-        longest: 45
-      };
-
-      const totalSize = length + width + height;
-      const longestSide = Math.max(length, width, height);
-
-      if (volumeWeight <= max711.weight && totalSize <= max711.size && longestSide <= max711.longest) {
-        method = "7-11 交貨便";
-        cost = 60;
+      if (totalVolume <= 4500) {
+        method = '7-11 交貨便';
+        fee = 60;
+      } else if (totalVolume <= 7000) {
+        method = '7-11 交貨便';
+        fee = 65;
+      } else if (totalVolume <= 6000) {
+        method = '黑貓宅急便';
+        fee = 130;
+        warning = '⚠️ 材積超過超商限制，自動轉為黑貓宅配。';
+      } else if (totalVolume <= 12000) {
+        method = '黑貓宅急便';
+        fee = 150;
+        warning = '⚠️ 材積超過超商限制，自動轉為黑貓宅配。';
+      } else if (totalVolume <= 20000) {
+        method = '黑貓宅急便';
+        fee = 170;
+        warning = '⚠️ 材積大，建議確認打包方式。';
       } else {
-        method = "黑貓宅急便";
-        if (volumeWeight <= 5) cost = 170;
-        else if (volumeWeight <= 10) cost = 210;
-        else if (volumeWeight <= 15) cost = 250;
-        else if (volumeWeight <= 20) cost = 290;
-        else cost = 330;
+        method = '黑貓宅急便（大件）';
+        fee = 200;
+        warning = '⚠️ 材積極大，請務必留意實際裝箱尺寸與重量。';
       }
 
-      cost += 10; // 加收 NT$10 手續費
+      fee += 10; // 手續與包材費
 
-      document.getElementById("result").innerHTML = `
-        👉 預估包裝體積：約 ${estimatedBoxVol.toFixed(0)} cm³<br>
-        👉 預估尺寸（長×寬×高）：${length.toFixed(1)} × ${width.toFixed(1)} × ${height.toFixed(1)} cm<br>
-        📦 計費重：約 ${volumeWeight.toFixed(2)} kg<br>
-        🚚 建議寄送方式：<strong>${method}</strong><br>
-        💰 預估運費（含手續費）：<strong>NT$${cost}</strong>
-      `;
+      document.getElementById('result').textContent = `預估運送方式：${method}，運費：NT$${fee}`;
+      document.getElementById('warning').textContent = warning;
     }
   </script>
 </body>
