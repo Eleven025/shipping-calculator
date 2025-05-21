@@ -1,66 +1,139 @@
-
 <!DOCTYPE html>
-<html lang="zh-TW">
+<html lang="zh-Hant">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>運費試算工具</title>
+  <title>混合商品運費試算器</title>
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC&display=swap" rel="stylesheet">
   <style>
-    body { font-family: sans-serif; padding: 2rem; max-width: 600px; margin: auto; }
-    label, input { display: block; margin-top: 1rem; width: 100%; }
-    button { margin-top: 1.5rem; padding: 0.5rem; font-size: 1rem; }
-    .note { font-size: 0.9rem; color: #555; margin-top: 2rem; }
-    .inserted-image { max-width: 100%; margin-top: 1rem; }
-    .alert { color: red; font-weight: bold; margin-top: 1rem; }
+    :root {
+      --main-color: #fdb81d;
+      --bg-color: #fdfefd;
+      --accent-blue: #4d58a7;
+      --accent-red: #f0593c;
+    }
+
+    body {
+      font-family: 'Noto Sans TC', sans-serif;
+      background-color: var(--bg-color);
+      margin: 0;
+      padding: 2rem;
+      color: #333;
+    }
+
+    .container {
+      max-width: 500px;
+      margin: auto;
+      background: white;
+      border-radius: 12px;
+      box-shadow: 0 0 10px rgba(0,0,0,0.05);
+      padding: 2rem;
+    }
+
+    h1 {
+      color: var(--accent-blue);
+      font-size: 1.5rem;
+      margin-bottom: 1rem;
+    }
+
+    label {
+      display: block;
+      margin-top: 1rem;
+      font-weight: bold;
+    }
+
+    input[type="number"] {
+      width: 100%;
+      padding: 0.5rem;
+      margin-top: 0.25rem;
+      border: 1px solid #ccc;
+      border-radius: 8px;
+    }
+
+    button {
+      margin-top: 1.5rem;
+      width: 100%;
+      background: var(--main-color);
+      color: white;
+      padding: 0.75rem;
+      border: none;
+      border-radius: 8px;
+      font-size: 1rem;
+      cursor: pointer;
+    }
+
+    button:hover {
+      background: #e0a819;
+    }
+
+    .notice {
+      background: #fff8e1;
+      border-left: 5px solid var(--main-color);
+      padding: 1rem;
+      margin-top: 2rem;
+      font-size: 0.9rem;
+    }
+
+    .alert {
+      color: var(--accent-red);
+      margin-top: 1rem;
+      font-weight: bold;
+    }
   </style>
 </head>
 <body>
-  <h1>混合商品運費試算器</h1>
-  <label>迷你霧面小盒（11.8x8.8x3.8cm）數量：<input type="number" id="miniBox" value="0" /></label>
-  <label>亮面方形盒（14.9x16.1x3.8cm）數量：<input type="number" id="glossyBox" value="0" /></label>
-  <label>方形木頭杯墊（10x10x1.2cm）數量：<input type="number" id="coaster" value="0" /></label>
-  <button onclick="calculate()">計算運費</button>
-  <h2 id="result"></h2>
-  <div id="warning" class="alert"></div>
-  <div class="note">
-    <p>給審稿小精靈們：</p>
-    <ol>
-      <li>本頁面僅提供初步估計，若實際上需要補運費，會在出貨時通知客人</li>
-      <li>目前這個是 ChatGPT 寫的簡易使用網頁，可能會有尚未發現的 Bug，若有疑慮再請通知團主</li>
-      <li>由於收納盒和木頭杯墊體積大、數量多時可能超過超商限制，請參考下方附表或切換為宅配</li>
-    </ol>
-    <img src="YOUR_IMAGE_URL_HERE" alt="說明圖片" class="inserted-image" />
+  <div class="container">
+    <h1>📦 混合商品運費試算器</h1>
+    <label>迷你霧面小盒（11.8×8.8×3.8cm）數量</label>
+    <input id="item1" type="number" min="0" value="0" />
+
+    <label>亮面方形盒（14.9×16.1×3.8cm）數量</label>
+    <input id="item2" type="number" min="0" value="0" />
+
+    <label>方形木頭杯墊（10×10×1.2cm）數量</label>
+    <input id="item3" type="number" min="0" value="0" />
+
+    <button onclick="calculateShipping()">試算運費</button>
+
+    <div id="result" class="alert"></div>
+
+    <div class="notice">
+      <strong>📌 給審稿小精靈們：</strong>
+      <ol>
+        <li>本頁面僅提供初步估計，若實際上需要補運費，會在出貨時通知客人。</li>
+        <li>目前這個是 ChatGPT 寫的簡易使用網頁，可能會有尚未發現的 Bug，若有疑慮再請通知團主。</li>
+        <li>由於收納盒和木頭杯墊體積較大、數量多時材積變大＋重量變重，會超出超商店到店限制，這部分的運費計算時要再留意，或是參考下方附表（待補充）。</li>
+      </ol>
+    </div>
   </div>
+
   <script>
-    function calculate() {
-      const miniBox = parseInt(document.getElementById('miniBox').value) || 0;
-      const glossyBox = parseInt(document.getElementById('glossyBox').value) || 0;
-      const coaster = parseInt(document.getElementById('coaster').value) || 0;
+    function calculateShipping() {
+      const item1 = parseInt(document.getElementById('item1').value) || 0;
+      const item2 = parseInt(document.getElementById('item2').value) || 0;
+      const item3 = parseInt(document.getElementById('item3').value) || 0;
 
-      const totalVolume = miniBox * 400 + glossyBox * 800 + coaster * 150;
-      let method = '';
-      let fee = 0;
-      let warning = '';
+      const vol1 = item1 * (11.8 * 8.8 * 3.8);
+      const vol2 = item2 * (14.9 * 16.1 * 3.8);
+      const vol3 = item3 * (10 * 10 * 1.2);
 
-      if (totalVolume <= 7000) {
-        method = '7-11 交貨便';
-        fee = 70; // 固定費用含包材
-      } else if (totalVolume <= 12000) {
-        method = '黑貓宅急便';
-        fee = 150 + 10;
-        warning = '⚠️ 材積超過超商限制，自動轉為黑貓宅配。';
-      } else if (totalVolume <= 20000) {
-        method = '黑貓宅急便';
-        fee = 170 + 10;
-        warning = '⚠️ 材積大，建議確認打包方式。';
+      const totalVolume = vol1 + vol2 + vol3;
+      const cmToCubicM = totalVolume / 1000000;
+
+      let shippingMethod = '';
+      let shippingFee = 0;
+
+      if (cmToCubicM > 0.02) {
+        shippingMethod = '黑貓宅急便';
+        shippingFee = 100; // base + 包材 + 運費
       } else {
-        method = '黑貓宅急便（大件）';
-        fee = 200 + 10;
-        warning = '⚠️ 材積極大，請務必留意實際裝箱尺寸與重量。';
+        shippingMethod = '7-11交貨便';
+        shippingFee = 70;
       }
 
-      document.getElementById('result').textContent = `預估運送方式：${method}，運費：NT$${fee}`;
-      document.getElementById('warning').textContent = warning;
+      const result = `${shippingMethod}（含包材）估計運費：NT$${shippingFee}元`;
+
+      document.getElementById('result').textContent = result;
     }
   </script>
 </body>
