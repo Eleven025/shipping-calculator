@@ -42,31 +42,22 @@
       let fee = 0;
       let warning = '';
 
-      if (totalVolume <= 4500) {
+      if (totalVolume <= 7000) {
         method = '7-11 交貨便';
-        fee = 60;
-      } else if (totalVolume <= 7000) {
-        method = '7-11 交貨便';
-        fee = 65;
-      } else if (totalVolume <= 6000) {
-        method = '黑貓宅急便';
-        fee = 130;
-        warning = '⚠️ 材積超過超商限制，自動轉為黑貓宅配。';
+        fee = 70; // 固定費用含包材
       } else if (totalVolume <= 12000) {
         method = '黑貓宅急便';
-        fee = 150;
+        fee = 150 + 10;
         warning = '⚠️ 材積超過超商限制，自動轉為黑貓宅配。';
       } else if (totalVolume <= 20000) {
         method = '黑貓宅急便';
-        fee = 170;
+        fee = 170 + 10;
         warning = '⚠️ 材積大，建議確認打包方式。';
       } else {
         method = '黑貓宅急便（大件）';
-        fee = 200;
+        fee = 200 + 10;
         warning = '⚠️ 材積極大，請務必留意實際裝箱尺寸與重量。';
       }
-
-      fee += 10; // 手續與包材費
 
       document.getElementById('result').textContent = `預估運送方式：${method}，運費：NT$${fee}`;
       document.getElementById('warning').textContent = warning;
