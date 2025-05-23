@@ -3,94 +3,87 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>千層派對｜混合商品運費計算機(1.0 ver.)</title>
+  <title>🍰 千層派對｜混合商品運費計算機(1.0 ver.)</title>
   <style>
     body {
-      font-family: 'Segoe UI', 'Noto Sans TC', sans-serif;
-      background-color: #fdfefd;
-      color: #333;
-      margin: 0;
-      padding: 2rem;
-    }
-    .container {
-      max-width: 600px;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+      padding: 20px;
       margin: 0 auto;
-      padding: 2rem;
-      background-color: #fff;
-      border-radius: 10px;
-      box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+      background-color: #fdfefd;
+      max-width: 480px;
     }
     h1 {
       color: #4d58a7;
       font-size: 1.5rem;
-      margin-bottom: 1.5rem;
+      margin-bottom: 1rem;
     }
     label {
       display: block;
-      margin: 1rem 0 0.5rem;
-      font-weight: bold;
+      margin-top: 10px;
+      font-weight: 500;
     }
-    input[type="number"] {
+    input {
+      padding: 10px;
+      margin-top: 5px;
       width: 100%;
-      padding: 0.5rem;
+      box-sizing: border-box;
       border: 1px solid #ccc;
-      border-radius: 6px;
-    }
-    button {
-      margin-top: 1.5rem;
-      padding: 0.75rem;
-      background-color: #fdb81d;
-      color: white;
-      border: none;
       border-radius: 8px;
       font-size: 1rem;
-      cursor: pointer;
+    }
+    button {
+      background-color: #fdb81d;
+      border: none;
+      color: white;
+      padding: 12px;
+      margin-top: 20px;
+      font-size: 1rem;
       width: 100%;
+      border-radius: 10px;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+      cursor: pointer;
     }
-    .result {
-      margin-top: 1.5rem;
-      font-size: 1.1rem;
-      padding: 1rem;
-      background-color: #fdf5e6;
-      border-left: 6px solid #f0593c;
+    button:hover {
+      opacity: 0.95;
+    }
+    #result {
+      margin-top: 20px;
       color: #f0593c;
+      font-weight: bold;
+      font-size: 1.1rem;
     }
-    .note {
-      margin-top: 2rem;
-      padding: 1rem;
-      background-color: #fff6f2;
-      border-left: 6px solid #f0593c;
+    .warning {
+      color: red;
+      font-weight: bold;
+    }
+    #notice {
+      margin-top: 30px;
       font-size: 0.9rem;
+      line-height: 1.5;
     }
-    .note p {
-      margin: 0.5rem 0;
+    ol {
+      padding-left: 1.2rem;
     }
   </style>
 </head>
 <body>
-  <div class="container">
-    <h1>🍰 千層派對｜混合商品運費計算機(1.0 ver.)</h1>
-    <label>迷你霧面小盒（11.8×8.8×3.8cm）數量</label>
-    <input type="number" id="miniBox" min="0" value="0" />
-
-    <label>亮面方形盒（14.9×16.1×3.8cm）數量</label>
-    <input type="number" id="glossyBox" min="0" value="0" />
-
-    <label>木頭杯墊（10×10×1.2cm）數量</label>
-    <input type="number" id="coaster" min="0" value="0" />
-
-    <button onclick="calculateShipping()">計算運費</button>
-
-    <div class="result" id="result"></div>
-
-    <div class="note">
-      <p>📌 <strong>給審稿小精靈們：</strong></p>
-      <p>1. 本頁面僅提供初步估計，若實際上需要補運費，會在出貨時通知客人。</p>
-      <p>2. 目前這個是 ChatGPT 寫的簡易版網頁，可能會有上未發現的 Bug，若有疑慮再請通知團主。</p>
-      <p>3. 由於收納盒和木頭杯墊體積較大，數量多時重量會變重，可能超出超商店到店限制，這部分的運費計算時要再留意，或是參考下方附表</p>
-      <p>5. 數量基本上以５的倍數為一個單位，詳情參考開團規定或參考官網。</p>
-      <p>4. 有任何疑惑或是發現問題，請通知團主！</p>
-    </div>
+  <h1>🍰 千層派對｜混合商品運費計算機(1.0 ver.)</h1>
+  <label>迷你霧面小盒（11.8×8.8×3.8cm）數量</label>
+  <input type="number" id="miniBox" value="0" />
+  <label>亮面方形盒（14.9×16.1×3.8cm）數量</label>
+  <input type="number" id="glossyBox" value="0" />
+  <label>木頭杯墊（10×10×1.2cm）數量</label>
+  <input type="number" id="coaster" value="0" />
+  <button onclick="calculateShipping()">計算運費</button>
+  <div id="result"></div>
+  <div id="notice">
+    <p><strong>給審稿小精靈們：</strong></p>
+    <ol>
+      <li>本頁面僅提供初步估計，若實際上需要補運費，會在出貨時通知客人。</li>
+      <li>目前這是 ChatGPT 協助製作的網頁，可能仍存在未發現的 Bug，若有疑慮請通知團主。</li>
+      <li>由於收納盒與木頭杯墊體積較大，數量多時會超出超商限制，系統有加入材積及重量判定，請參考產生的結果向客人報價。</li>
+      <li>感謝各位小精靈，如果有遇到什麼問題再請告訴我們，辛苦了！😭</li>
+    </ol>
   </div>
 
   <script>
@@ -99,36 +92,36 @@
       const glossyBox = parseInt(document.getElementById("glossyBox").value) || 0;
       const coaster = parseInt(document.getElementById("coaster").value) || 0;
 
-      const totalVolume =
-        miniBox * 393.75 +
-        glossyBox * 913.45 +
-        coaster * 120;
-
-      const materialMargin = 1.25;
-      const estimateVolume = totalVolume * materialMargin;
-      const cubeSize = Math.cbrt(estimateVolume);
+      // 體積計算 (cm^3)
+      const miniVol = 11.8 * 8.8 * 3.8 * miniBox;
+      const glossyVol = 14.9 * 16.1 * 3.8 * glossyBox;
+      const coasterVol = 10 * 10 * 1.2 * coaster;
+      const totalVol = miniVol + glossyVol + coasterVol;
+      const cubeSize = Math.cbrt(totalVol);
       const dimSum = cubeSize * 3;
+
+      // 重量計算 (g → kg)
+      const totalWeight = (miniBox * 48 + glossyBox * 99 + coaster * 60) / 1000;
 
       let method = "7-11 交貨便";
       let shipping = 70;
+      let warning = "";
 
-      if (dimSum > 105 || cubeSize > 30) {
+      if (dimSum > 105 || cubeSize > 30 || totalWeight > 5) {
         method = "黑貓宅急便";
         if (dimSum <= 60) shipping = 140;
-        else if (dimSum <= 80) shipping = 180;
-        else if (dimSum <= 100) shipping = 220;
-        else if (dimSum <= 120) shipping = 260;
+        else if (dimSum <= 90) shipping = 170;
+        else if (dimSum <= 120) shipping = 210;
         else shipping = 260;
+
+        warning = totalWeight > 5
+          ? "⚠️ 超過超商重量限制（5公斤），改用黑貓宅配"
+          : "⚠️ 超過超商材積限制，改用黑貓宅配";
       }
 
-      const result =
-        "預估運送方式：<b>" +
-        method +
-        "</b><br>運費報價：<b>NT$" +
-        shipping +
-        "</b> (含包材)";
-
-      document.getElementById("result").innerHTML = result;
+      document.getElementById("result").innerHTML =
+        `${warning ? `<p class='warning'>${warning}</p>` : ""}
+         建議寄送方式：${method}<br>預估運費：NT$${shipping}`;
     }
   </script>
 </body>
